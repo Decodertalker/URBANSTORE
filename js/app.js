@@ -9,9 +9,11 @@ const sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANO
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const MONEDA = CONFIG.MONEDA || '';
+const emailDe = (usuario) => `${String(usuario).trim().toLowerCase()}@${CONFIG.DOMINIO_USUARIOS}`;
 
 const state = {
   user: null,
+  usuario: null,
   rol: null,
   productos: [],
   filtro: '',
@@ -55,13 +57,10 @@ function ocupado(btn, on, texto) {
 
 function traducirError(err) {
   const m = (err && err.message) || String(err);
-  if (/Invalid login credentials/i.test(m)) return 'Correo o contraseña incorrectos.';
-  if (/Database error saving new user|Correo no autorizado/i.test(m)) {
-    return 'Este correo no está autorizado. Pide al administrador que lo agregue.';
-  }
-  if (/already registered|already been registered/i.test(m)) return 'Ya existe una cuenta con ese correo. Inicia sesión.';
-  if (/Email not confirmed/i.test(m)) return 'Confirma tu correo antes de entrar (revisa tu bandeja).';
+  if (/Invalid login credentials/i.test(m)) return 'Usuario o contraseña incorrectos.';
+  if (/Email not confirmed/i.test(m)) return 'La cuenta no está confirmada. Contacta al administrador.';
   if (/Password should be at least/i.test(m)) return 'La contraseña debe tener al menos 8 caracteres.';
+  if (/same password|different from the old/i.test(m)) return 'La nueva contraseña debe ser distinta a la actual.';
   if (/rate limit/i.test(m)) return 'Demasiados intentos. Espera unos minutos.';
   return m;
 }
@@ -95,13 +94,6 @@ async function iniciar() {
   sb.auth.onAuthStateChange((evento, sesion) => {
     // setTimeout evita bloqueos al llamar a Supabase dentro del callback
     setTimeout(async () => {
-      if (evento === 'PASSWORD_RECOVERY') {
-        const nueva = prompt('Escribe tu nueva contraseña (mínimo 8 caracteres):');
-        if (nueva && nueva.length >= 8) {
-          const { error } = await sb.auth.updateUser({ password: nueva });
-          toast(error ? traducirError(error) : 'Contraseña actualizada', error ? 'error' : 'ok');
-        }
-      }
       if (evento === 'SIGNED_OUT') return alCambiarSesion(null);
       if (evento === 'SIGNED_IN' && sesion?.user?.id !== state.user?.id) return alCambiarSesion(sesion);
     }, 0);
@@ -119,7 +111,7 @@ async function alCambiarSesion(sesion) {
 
   const email = (sesion.user.email || '').toLowerCase();
   const { data, error } = await sb.from('usuarios_permitidos')
-    .select('rol, activo').eq('email', email).maybeSingle();
+    .select('usuario, rol, activo').eq('email', email).maybeSingle();
 
   if (error || !data || !data.activo) {
     await sb.auth.signOut();
@@ -130,7 +122,8 @@ async function alCambiarSesion(sesion) {
 
   state.user = sesion.user;
   state.rol = data.rol;
-  $('#app-usuario').textContent = `${email} · ${data.rol === 'admin' ? 'Administrador' : 'Empleado'}`;
+  state.usuario = data.usuario;
+  $('#app-usuario').textContent = `${data.usuario} · ${data.rol === 'admin' ? 'Administrador' : 'Empleado'}`;
   $('#tab-usuarios').classList.toggle('hidden', data.rol !== 'admin');
   mostrar('app');
   irTab('productos');
@@ -144,38 +137,23 @@ $('#form-login').addEventListener('submit', async (e) => {
   msgLogin('');
   ocupado(btn, true, 'Entrando…');
   const { error } = await sb.auth.signInWithPassword({
-    email: $('#login-email').value.trim().toLowerCase(),
+    email: emailDe($('#login-usuario').value),
     password: $('#login-pass').value
   });
   ocupado(btn, false);
   if (error) msgLogin(traducirError(error));
 });
 
-$('#btn-registro').addEventListener('click', async () => {
-  const email = $('#login-email').value.trim().toLowerCase();
-  const password = $('#login-pass').value;
-  if (!email || password.length < 8) {
-    return msgLogin('Escribe tu correo y una contraseña de al menos 8 caracteres.');
-  }
-  const btn = $('#btn-registro');
-  ocupado(btn, true, 'Creando…');
-  const { data, error } = await sb.auth.signUp({ email, password });
-  ocupado(btn, false);
-  if (error) return msgLogin(traducirError(error));
-  if (!data.session) msgLogin('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.', 'ok');
-});
-
-$('#btn-olvide').addEventListener('click', async () => {
-  const email = $('#login-email').value.trim().toLowerCase();
-  if (!email) return msgLogin('Escribe tu correo arriba y vuelve a pulsar.');
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: location.origin + location.pathname
-  });
-  msgLogin(error ? traducirError(error) : 'Si el correo está registrado, recibirás un enlace para cambiar la contraseña.', error ? '' : 'ok');
-});
-
 $('#btn-salir').addEventListener('click', () => sb.auth.signOut());
 $('#btn-refrescar').addEventListener('click', () => cargarProductos(false, true));
+
+$('#btn-clave').addEventListener('click', async () => {
+  const nueva = prompt('Nueva contraseña (mínimo 8 caracteres):');
+  if (nueva === null) return;
+  if (nueva.length < 8) return toast('La contraseña debe tener al menos 8 caracteres.', 'error');
+  const { error } = await sb.auth.updateUser({ password: nueva });
+  toast(error ? traducirError(error) : 'Contraseña actualizada', error ? 'error' : 'ok');
+});
 
 /* ---------- Pestañas ---------- */
 function irTab(nombre) {
@@ -599,55 +577,68 @@ $('#btn-importar').addEventListener('click', async (e) => {
 async function cargarUsuarios() {
   if (state.rol !== 'admin') return;
   const cont = $('#lista-usuarios');
-  const { data, error } = await sb.from('usuarios_permitidos').select('*').order('creado_en');
+  const { data, error } = await sb.from('usuarios_permitidos')
+    .select('usuario, rol, activo').order('creado_en');
   if (error) { cont.textContent = traducirError(error); return; }
-  const yo = (state.user.email || '').toLowerCase();
   cont.innerHTML = data.map((u) => {
-    const soyYo = u.email === yo;
+    const soyYo = u.usuario === state.usuario;
     return `
-      <div class="usuario ${u.activo ? '' : 'inactivo'}" data-email="${esc(u.email)}">
-        <div class="correo">${esc(u.email)}${soyYo ? '<small>(tú)</small>' : ''}</div>
+      <div class="usuario ${u.activo ? '' : 'inactivo'}" data-usuario="${esc(u.usuario)}">
+        <div class="correo">${esc(u.usuario)}${soyYo ? '<small>(tú)</small>' : ''}</div>
         <select data-act="rol" ${soyYo ? 'disabled' : ''} aria-label="Rol">
           <option value="empleado" ${u.rol === 'empleado' ? 'selected' : ''}>Empleado</option>
           <option value="admin" ${u.rol === 'admin' ? 'selected' : ''}>Administrador</option>
         </select>
+        <button class="btn" data-act="clave">Contraseña</button>
         <button class="btn" data-act="activo" ${soyYo ? 'disabled' : ''}>${u.activo ? 'Desactivar' : 'Activar'}</button>
-        <button class="btn peligro" data-act="borrar" ${soyYo ? 'disabled' : ''}>Quitar</button>
+        <button class="btn peligro" data-act="borrar" ${soyYo ? 'disabled' : ''}>Eliminar</button>
       </div>`;
   }).join('') || '<p>No hay usuarios.</p>';
 }
 
 $('#form-usuario').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = $('#u-email').value.trim().toLowerCase();
-  const { error } = await sb.from('usuarios_permitidos').insert({ email, rol: $('#u-rol').value });
-  if (error) return toast(error.code === '23505' ? 'Ese correo ya está en la lista.' : traducirError(error), 'error');
-  $('#u-email').value = '';
-  toast('Usuario agregado. Ya puede crear su cuenta.', 'ok');
+  const btn = $('#form-usuario button[type=submit]');
+  ocupado(btn, true, 'Creando…');
+  const { error } = await sb.rpc('crear_usuario', {
+    p_usuario: $('#u-usuario').value,
+    p_password: $('#u-pass').value,
+    p_rol: $('#u-rol').value
+  });
+  ocupado(btn, false);
+  if (error) return toast(error.message, 'error');
+  $('#u-usuario').value = '';
+  $('#u-pass').value = '';
+  toast('Usuario creado. Ya puede entrar con su usuario y contraseña.', 'ok');
   cargarUsuarios();
 });
 
 $('#lista-usuarios').addEventListener('click', async (e) => {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
-  const fila = b.closest('.usuario');
-  const email = fila.dataset.email;
+  const usuario = b.closest('.usuario').dataset.usuario;
   let error;
   if (b.dataset.act === 'activo') {
     const activar = b.textContent.trim() === 'Activar';
-    ({ error } = await sb.from('usuarios_permitidos').update({ activo: activar }).eq('email', email));
+    ({ error } = await sb.from('usuarios_permitidos').update({ activo: activar }).eq('usuario', usuario));
+  } else if (b.dataset.act === 'clave') {
+    const nueva = prompt(`Nueva contraseña para “${usuario}” (mínimo 8 caracteres):`);
+    if (nueva === null) return;
+    ({ error } = await sb.rpc('cambiar_password', { p_usuario: usuario, p_password: nueva }));
+    if (!error) toast('Contraseña cambiada', 'ok');
   } else if (b.dataset.act === 'borrar') {
-    if (!confirm(`¿Quitar el acceso de ${email}?`)) return;
-    ({ error } = await sb.from('usuarios_permitidos').delete().eq('email', email));
+    if (!confirm(`¿Eliminar al usuario “${usuario}”? Ya no podrá entrar.`)) return;
+    ({ error } = await sb.rpc('eliminar_usuario', { p_usuario: usuario }));
+    if (!error) toast('Usuario eliminado', 'ok');
   }
-  if (error) toast(traducirError(error), 'error');
+  if (error) toast(error.message, 'error');
   cargarUsuarios();
 });
 
 $('#lista-usuarios').addEventListener('change', async (e) => {
   if (e.target.dataset.act !== 'rol') return;
-  const email = e.target.closest('.usuario').dataset.email;
-  const { error } = await sb.from('usuarios_permitidos').update({ rol: e.target.value }).eq('email', email);
+  const usuario = e.target.closest('.usuario').dataset.usuario;
+  const { error } = await sb.from('usuarios_permitidos').update({ rol: e.target.value }).eq('usuario', usuario);
   toast(error ? traducirError(error) : 'Rol actualizado', error ? 'error' : 'ok');
 });
 

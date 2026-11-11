@@ -131,7 +131,7 @@ main { max-width: 900px; margin: 0 auto; padding: 12px; }
 .caja h2 { font-size: 17px; margin-bottom: 6px; }
 .caja p { color: var(--suave); font-size: 14px; margin: 0 0 12px; }
 .fila { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.fila input[type=email] { flex: 1 1 200px; width: auto; }
+.fila input { flex: 1 1 160px; width: auto; }
 .fila select { width: auto; }
 .fila.fin { margin-top: 8px; }
 .espacio { flex: 1; }

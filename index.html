@@ -17,16 +17,14 @@
       <div class="logo">👕</div>
       <h1 id="login-titulo">Inventario</h1>
       <p class="sub">Acceso solo para personal autorizado</p>
-      <label>Correo
-        <input id="login-email" type="email" autocomplete="username" required>
+      <label>Usuario
+        <input id="login-usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
       </label>
       <label>Contraseña
         <input id="login-pass" type="password" autocomplete="current-password" minlength="8" required>
       </label>
       <p id="login-msg" class="msg" role="alert"></p>
       <button id="btn-entrar" class="btn primario" type="submit">Entrar</button>
-      <button id="btn-registro" class="btn" type="button">Crear cuenta (correo autorizado)</button>
-      <button id="btn-olvide" class="btn link" type="button">Olvidé mi contraseña</button>
     </form>
   </section>
 
@@ -38,6 +36,7 @@
         <small id="app-usuario"></small>
       </div>
       <div class="topbar-acciones">
+        <button id="btn-clave" class="icono" title="Cambiar mi contraseña" aria-label="Cambiar mi contraseña">🔑</button>
         <button id="btn-refrescar" class="icono" title="Actualizar" aria-label="Actualizar">⟳</button>
         <button id="btn-salir" class="icono" title="Salir" aria-label="Salir">⎋</button>
       </div>
@@ -94,14 +93,15 @@
       <section id="panel-usuarios" class="panel hidden">
         <div class="caja">
           <h2>Usuarios permitidos</h2>
-          <p>Solo los correos de esta lista pueden crear cuenta y usar la app. La persona entra a la app y pulsa <b>Crear cuenta</b> con ese correo.</p>
+          <p>Crea usuarios con nombre de usuario y contraseña (sin correo). Cada persona entra a la app con esos datos y puede cambiar su contraseña con el botón 🔑.</p>
           <form id="form-usuario" class="fila">
-            <input id="u-email" type="email" placeholder="correo@ejemplo.com" required>
+            <input id="u-usuario" type="text" placeholder="usuario (ej. maria)" autocapitalize="none" autocomplete="off" spellcheck="false" required>
+            <input id="u-pass" type="text" placeholder="contraseña (mín. 8)" minlength="8" autocomplete="off" required>
             <select id="u-rol" aria-label="Rol">
               <option value="empleado">Empleado</option>
               <option value="admin">Administrador</option>
             </select>
-            <button class="btn primario" type="submit">Agregar</button>
+            <button class="btn primario" type="submit">Crear usuario</button>
           </form>
           <div id="lista-usuarios" class="usuarios"></div>
         </div>
