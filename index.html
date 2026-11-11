@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f2937">
+  <title>Inventario de Ropa</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <section id="vista-login" class="login hidden">
+    <form id="form-login" class="login-card" autocomplete="on">
+      <div class="logo">👕</div>
+      <h1 id="login-titulo">Inventario</h1>
+      <p class="sub">Acceso solo para personal autorizado</p>
+      <label>Correo
+        <input id="login-email" type="email" autocomplete="username" required>
+      </label>
+      <label>Contraseña
+        <input id="login-pass" type="password" autocomplete="current-password" minlength="8" required>
+      </label>
+      <p id="login-msg" class="msg" role="alert"></p>
+      <button id="btn-entrar" class="btn primario" type="submit">Entrar</button>
+      <button id="btn-registro" class="btn" type="button">Crear cuenta (correo autorizado)</button>
+      <button id="btn-olvide" class="btn link" type="button">Olvidé mi contraseña</button>
+    </form>
+  </section>
+
+  <!-- ===== APP ===== -->
+  <div id="vista-app" class="hidden">
+    <header class="topbar">
+      <div>
+        <strong id="app-titulo">Inventario</strong>
+        <small id="app-usuario"></small>
+      </div>
+      <div class="topbar-acciones">
+        <button id="btn-refrescar" class="icono" title="Actualizar" aria-label="Actualizar">⟳</button>
+        <button id="btn-salir" class="icono" title="Salir" aria-label="Salir">⎋</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="productos">Productos</button>
+      <button class="tab" data-tab="datos">Excel / Descargas</button>
+      <button class="tab hidden" id="tab-usuarios" data-tab="usuarios">Usuarios</button>
+    </nav>
+
+    <main>
+      <!-- Productos -->
+      <section id="panel-productos" class="panel">
+        <div class="stats" id="stats"></div>
+        <div class="barra">
+          <input id="buscar" type="search" placeholder="Buscar producto…" aria-label="Buscar">
+          <select id="orden" aria-label="Ordenar">
+            <option value="nombre">A–Z</option>
+            <option value="stock">Poco stock primero</option>
+            <option value="reciente">Recientes</option>
+          </select>
+        </div>
+        <div id="lista" class="lista"></div>
+        <button id="btn-nuevo" class="fab" aria-label="Agregar producto">＋</button>
+      </section>
+
+      <!-- Excel / Descargas -->
+      <section id="panel-datos" class="panel hidden">
+        <div class="caja">
+          <h2>Descargar base de datos actualizada</h2>
+          <p>Descarga el inventario tal como está ahora mismo en el sistema.</p>
+          <div class="fila">
+            <button id="btn-export-xlsx" class="btn primario">Descargar Excel (.xlsx)</button>
+            <button id="btn-export-csv" class="btn">Descargar CSV</button>
+          </div>
+        </div>
+
+        <div class="caja">
+          <h2>Importar desde Excel</h2>
+          <p>Columnas: <b>Nombre, Costo compra, Precio venta, Existencia</b>. Si el nombre ya existe, se actualizan sus datos (la foto se conserva). Las fotos se agregan después, producto por producto.</p>
+          <div class="fila">
+            <button id="btn-plantilla" class="btn">Descargar plantilla</button>
+            <label class="btn archivo">Elegir archivo…
+              <input id="archivo-excel" type="file" accept=".xlsx,.xls,.csv" hidden>
+            </label>
+          </div>
+          <div id="import-preview" class="preview hidden"></div>
+          <button id="btn-importar" class="btn primario hidden">Importar al inventario</button>
+        </div>
+      </section>
+
+      <!-- Usuarios -->
+      <section id="panel-usuarios" class="panel hidden">
+        <div class="caja">
+          <h2>Usuarios permitidos</h2>
+          <p>Solo los correos de esta lista pueden crear cuenta y usar la app. La persona entra a la app y pulsa <b>Crear cuenta</b> con ese correo.</p>
+          <form id="form-usuario" class="fila">
+            <input id="u-email" type="email" placeholder="correo@ejemplo.com" required>
+            <select id="u-rol" aria-label="Rol">
+              <option value="empleado">Empleado</option>
+              <option value="admin">Administrador</option>
+            </select>
+            <button class="btn primario" type="submit">Agregar</button>
+          </form>
+          <div id="lista-usuarios" class="usuarios"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL PRODUCTO ===== -->
+  <dialog id="modal-producto">
+    <form id="form-producto" method="dialog">
+      <h2 id="modal-titulo">Nuevo producto</h2>
+
+      <div class="foto-edit">
+        <div id="p-preview" class="foto grande"><span>👕</span></div>
+        <div class="foto-botones">
+          <label class="btn archivo">Tomar / elegir foto
+            <input id="p-foto" type="file" accept="image/*" hidden>
+          </label>
+          <button id="p-quitar-foto" type="button" class="btn link hidden">Quitar foto</button>
+        </div>
+      </div>
+
+      <label>Nombre del producto
+        <input id="p-nombre" type="text" maxlength="150" required>
+      </label>
+      <div class="dos">
+        <label>Costo de compra
+          <input id="p-costo" type="number" inputmode="decimal" min="0" step="0.01" value="0" required>
+        </label>
+        <label>Precio de venta
+          <input id="p-precio" type="number" inputmode="decimal" min="0" step="0.01" value="0" required>
+        </label>
+      </div>
+      <label>Existencia
+        <input id="p-existencia" type="number" inputmode="numeric" min="0" step="1" value="0" required>
+      </label>
+
+      <p id="p-msg" class="msg" role="alert"></p>
+      <div class="fila fin">
+        <button id="p-eliminar" type="button" class="btn peligro hidden">Eliminar</button>
+        <span class="espacio"></span>
+        <button id="p-cancelar" type="button" class="btn">Cancelar</button>
+        <button id="p-guardar" type="submit" class="btn primario">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

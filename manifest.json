@@ -1,0 +1,14 @@
+{
+  "name": "Inventario de Ropa",
+  "short_name": "Inventario",
+  "description": "Inventario de tienda de ropa",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#1f2937",
+  "lang": "es",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
