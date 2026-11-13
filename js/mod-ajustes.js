@@ -44,7 +44,31 @@ App.registrar('ajustes', (() => {
     }).join('') || '<p class="muted">No hay usuarios.</p>';
   }
 
+  /* ---------- Alertas de reposición ---------- */
+  async function cargarAlertasCfg() {
+    const { data, error } = await sb.from('config_alertas').select('*').eq('id', 1).maybeSingle();
+    if (error || !data) { if (error) toast(traducirError(error), 'error'); return; }
+    $('#al-activa').checked = data.activa;
+    $('#al-top').value = data.top_n;
+    $('#al-unid').value = data.unidades_min;
+    $('#al-pct').value = data.porcentaje_min;
+  }
+
   function iniciar() {
+    $('#alerta-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('#alerta-form button[type=submit]');
+      ocupado(btn, true, 'Guardando…');
+      const { error } = await sb.rpc('guardar_alertas', {
+        p_activa: $('#al-activa').checked,
+        p_top_n: parseInt($('#al-top').value, 10),
+        p_unidades: parseInt($('#al-unid').value, 10),
+        p_porcentaje: parseInt($('#al-pct').value, 10)
+      });
+      ocupado(btn, false);
+      toast(error ? error.message : 'Alertas guardadas', error ? 'error' : 'ok');
+    });
+
     $('#cat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = $('#cat-form button[type=submit]');
@@ -131,6 +155,7 @@ App.registrar('ajustes', (() => {
   function mostrar() {
     pintarCategorias();
     cargarUsuarios();
+    cargarAlertasCfg();
   }
 
   return { iniciar, mostrar };

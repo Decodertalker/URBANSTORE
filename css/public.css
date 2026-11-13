@@ -115,3 +115,16 @@ dialog.detalle { width: min(740px, calc(100% - 32px)); }
   .m-grid { grid-template-columns: 1fr; }
   .m-thumb { border-right: 0; border-bottom: var(--line); min-height: 220px; }
 }
+
+/* Móvil: objetivos táctiles y ajustes */
+@media (pointer: coarse) {
+  .logo { display: inline-block; padding: 8px 0; }
+  .nav a.link, .nav a.btn { display: inline-flex; align-items: center; min-height: 44px; }
+  .site-footer a.staff { display: inline-block; padding: 12px 4px; }
+}
+@media (max-height: 500px) and (orientation: landscape) { .site-header { position: static; } }
+@media (max-width: 380px) {
+  .logo { font-size: 1.05rem; }
+  .site-header .nav { gap: 8px; }
+  .site-header .nav .btn.small { padding: 8px 10px; font-size: .78rem; }
+}

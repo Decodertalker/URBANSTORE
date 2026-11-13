@@ -149,7 +149,7 @@ App.registrar('vender', (() => {
     $('#v-unid').textContent = unidades;
     $('#v-sub').textContent = money(subtotal);
     $('#v-total').textContent = money(total);
-    $('#v-barra-n').textContent = `${unidades} ${unidades === 1 ? 'unidad' : 'unidades'}`;
+    $('#v-barra-n').textContent = `${unidades} u.`;
     $('#v-barra-t').textContent = money(total);
     $('#v-barra').classList.toggle('hidden', !cart.length);
 

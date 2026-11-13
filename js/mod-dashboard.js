@@ -27,6 +27,24 @@ App.registrar('dashboard', (() => {
     pintarTop(data.top || []);
     pintarDias(data.por_dia || [], r.hoy);
     pintarInventario(data.inventario, data.stock_bajo || []);
+    cargarAlertas();
+  }
+
+  async function cargarAlertas() {
+    const caja = $('#db-alertas-box');
+    const { data, error } = await sb.rpc('alertas_reposicion', { p_tz: tz() });
+    if (error) { caja.classList.remove('hay'); $('#db-alertas').innerHTML = `<p class="msg">${esc(traducirError(error))}</p>`; return; }
+    const items = data.items || [];
+    caja.classList.toggle('hay', items.length > 0);
+    if (!data.config.activa) { $('#db-alertas').innerHTML = '<p class="muted" style="margin:0">Las alertas están apagadas (se activan en Ajustes).</p>'; return; }
+    $('#db-alertas').innerHTML = items.length
+      ? items.map((a) => `
+          <div class="alerta-fila">
+            <span class="pos">#${esc(a.puesto)}</span>
+            <span class="p">${esc(a.nombre)}<small>${esc(a.codigo)} · vendidos este mes: ${esc(entero(a.vendidos))}</small></span>
+            <span class="q">Quedan ${esc(entero(a.existencia))}<small style="display:block;font-weight:500">${esc(a.pct_restante)} % del stock</small></span>
+          </div>`).join('')
+      : '<p class="muted" style="margin:0">Ningún producto top del mes se está agotando.</p>';
   }
 
   function pintarKpis(d) {

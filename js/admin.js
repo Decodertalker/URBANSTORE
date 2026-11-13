@@ -101,6 +101,9 @@ const App = {
 
   async abrirPanel() {
     $$('#tabs .tab').forEach((t) => { t.classList.toggle('hidden', !!t.dataset.admin && !this.esAdmin()); });
+    const unaSola = $$('#tabs .tab:not(.hidden)').length <= 1;
+    $('#tabs').classList.toggle('solo', unaSola);
+    $('#vista-app').classList.toggle('solo-tab', unaSola);
     if (this.esAdmin()) {
       try {
         await Promise.all([this.cargarCategorias(), this.cargarProductos()]);

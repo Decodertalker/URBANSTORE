@@ -29,6 +29,12 @@ Cada entrada, salida y ajuste guarda el **usuario** que lo hizo.
 - Plantilla en `plantilla/PLANTILLA_URBANSTORE.xlsx`. Se importa la hoja **entrada** (ID y código se generan solos). Si el producto ya existe, se suma la cantidad. La importación es todo o nada: si una fila tiene error, se indica la fila.
 - *Excel → Descargar base de datos* baja un libro con GENERAL, entrada y SALIDA actualizados. Los reportes también se exportan con sus filtros.
 
+## Alertas de reposición
+En *Ajustes → Alertas de reposición* defines cuántos de los productos más vendidos del mes vigilar (top N) y cuándo avisar: cuando queden X unidades o menos, o cuando quede X % o menos de lo que había al empezar el mes (0 apaga ese criterio). Los avisos salen en el Dashboard, en la tarjeta "Por reponer".
+
+## Limpieza inicial (una sola vez)
+`limpieza_inicial.sql` borra salidas, ventas y ajustes de prueba, devuelve al inventario las unidades de esas ventas y registra el inventario general como entradas (sin duplicar). No volver a ejecutarlo.
+
 ## Notas
 - La existencia solo cambia mediante entradas, ventas o ajustes (todo queda registrado).
 - Las ventas toman el precio desde la base de datos y no permiten vender más de lo que hay.
