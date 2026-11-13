@@ -27,7 +27,7 @@ jobs:
       - name: Preparar archivos de la app
         run: |
           mkdir _site
-          cp -r index.html manifest.json sw.js icon.svg css js _site/
+          cp -r index.html admin.html manifest.json sw.js icon.svg css js plantilla _site/
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5
