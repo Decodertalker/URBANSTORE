@@ -35,6 +35,9 @@ En *Ajustes → Alertas de reposición* defines cuántos de los productos más v
 ## Limpieza inicial (una sola vez)
 `limpieza_inicial.sql` borra salidas, ventas y ajustes de prueba, devuelve al inventario las unidades de esas ventas y registra el inventario general como entradas (sin duplicar). No volver a ejecutarlo.
 
+## Seguridad de la sesión
+Si nadie toca la pantalla durante 60 segundos (cambia `INACTIVIDAD_SEG` en `js/config.js`), el panel avisa en los últimos 10 s y cierra la sesión; hay que entrar otra vez con usuario y contraseña. También se pide al reabrir la app pasado ese tiempo. El carrito sin cobrar se pierde al cerrarse.
+
 ## Notas
 - La existencia solo cambia mediante entradas, ventas o ajustes (todo queda registrado).
 - Las ventas toman el precio desde la base de datos y no permiten vender más de lo que hay.

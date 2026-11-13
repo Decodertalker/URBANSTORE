@@ -10,6 +10,9 @@ const CONFIG = {
 
   NOMBRE_TIENDA: 'URBANSTORE',
   MONEDA: 'C$',
+  // Segundos sin actividad antes de cerrar la sesión del panel y pedir contraseña otra vez
+  INACTIVIDAD_SEG: 60,
+
   STOCK_BAJO: 3, // con esta cantidad o menos se marca "poco stock"
 
   // Datos de contacto de la página pública. Deja vacío ('') lo que no quieras mostrar.
