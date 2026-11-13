@@ -101,9 +101,18 @@
             </div>
             <div id="v-sug" class="sug"></div>
           </div>
+          <div class="box" id="v-catalogo-box">
+            <div class="scanrow">
+              <input id="v-filtro" type="search" placeholder="Filtrar listado de productos…" autocomplete="off" aria-label="Filtrar listado de productos">
+              <select id="v-cat" aria-label="Categoría"><option value="">Todas</option></select>
+            </div>
+            <p id="v-cuenta" class="muted" style="margin:8px 0 0"></p>
+            <div id="v-lista" class="vlista"></div>
+            <button id="v-mas" class="btn hidden" type="button">Mostrar más</button>
+          </div>
           <div id="v-lineas" class="cart"></div>
         </div>
-        <aside class="box sum" aria-label="Consolidado de la venta">
+        <aside class="box sum" id="v-resumen" aria-label="Consolidado de la venta">
           <h3>Consolidado</h3>
           <div class="r"><span>Productos distintos</span><b id="v-items">0</b></div>
           <div class="r"><span>Unidades</span><b id="v-unid">0</b></div>
@@ -125,6 +134,7 @@
           <button id="v-vaciar" class="btn" type="button">Vaciar carrito</button>
         </aside>
       </div>
+      <button id="v-barra" class="cartbar hidden" type="button">Carrito · <span id="v-barra-n">0</span> · Total <b id="v-barra-t">0.00</b></button>
     </section>
 
     <!-- ===== Productos ===== -->

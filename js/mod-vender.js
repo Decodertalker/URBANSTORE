@@ -8,6 +8,9 @@ App.registrar('vender', (() => {
   let token = 0;
   let timer = null;
   let ultima = null;
+  let catalogo = [];
+  let cargado = false;
+  let visibles = 40;
 
   const limpiarQ = (q) => String(q).replace(/[%,()*\\]/g, ' ').trim();
 
@@ -57,6 +60,42 @@ App.registrar('vender', (() => {
     if (window.matchMedia('(pointer: fine)').matches) i.focus();
   }
 
+  /* ---------- Listado de productos ---------- */
+  async function cargarCatalogo() {
+    try {
+      catalogo = await traerTodo(() => sb.from('productos_venta').select(COLS).order('nombre'));
+      cargado = true;
+      const cats = [...new Set(catalogo.map((p) => p.categoria).filter(Boolean))].sort();
+      $('#v-cat').innerHTML = '<option value="">Todas</option>' + cats.map((c) => `<option>${esc(c)}</option>`).join('');
+    } catch (e) { toast(traducirError(e), 'error'); }
+    pintarLista();
+  }
+
+  function pintarLista() {
+    const q = norm($('#v-filtro').value);
+    const cat = $('#v-cat').value;
+    const lista = catalogo.filter((p) => (!cat || p.categoria === cat) && (!q || norm(`${p.nombre} ${p.codigo}`).includes(q)));
+    $('#v-cuenta').textContent = cargado ? `${lista.length} ${lista.length === 1 ? 'producto' : 'productos'}` : 'Cargando productos…';
+    $('#v-lista').innerHTML = lista.slice(0, visibles).map((p) => {
+      const enCarro = (cart.find((l) => l.id === p.id) || {}).cant || 0;
+      const agotado = Number(p.existencia) <= 0;
+      return `
+        <div class="vcard ${agotado ? 'agotado' : ''}" data-id="${p.id}">
+          <span class="thumb" style="${estiloMiniatura(p)}">${contenidoMiniatura(p)}</span>
+          <div style="min-width:0">
+            <h3>${esc(p.nombre)}</h3>
+            <div class="code">${esc(p.codigo)}</div>
+            <div class="pp"><span>Precio <b>${esc(money(p.precio_venta))}</b></span><span>${agotado ? 'Agotado' : `Disp. <b>${p.existencia}</b>`}</span></div>
+            <div class="acts">
+              <button type="button" class="btn small dark" data-add="${p.id}" ${agotado ? 'disabled' : ''}>Agregar al carrito</button>
+              ${enCarro ? `<span class="enc">En carrito: ${enCarro}</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('') || '<p class="muted">No hay productos que coincidan.</p>';
+    $('#v-mas').classList.toggle('hidden', lista.length <= visibles);
+  }
+
   /* ---------- Carrito ---------- */
   function agregar(p) {
     const existencia = Number(p.existencia);
@@ -92,6 +131,7 @@ App.registrar('vender', (() => {
         </div>`).join('');
     }
     totales();
+    if (cargado) pintarLista();
   }
 
   function descuento(subtotal) {
@@ -109,6 +149,9 @@ App.registrar('vender', (() => {
     $('#v-unid').textContent = unidades;
     $('#v-sub').textContent = money(subtotal);
     $('#v-total').textContent = money(total);
+    $('#v-barra-n').textContent = `${unidades} ${unidades === 1 ? 'unidad' : 'unidades'}`;
+    $('#v-barra-t').textContent = money(total);
+    $('#v-barra').classList.toggle('hidden', !cart.length);
 
     const efectivo = $('#v-metodo').value === 'efectivo';
     $('#v-fila-recibido').hidden = !efectivo;
@@ -155,6 +198,7 @@ App.registrar('vender', (() => {
     if (error) { toast(traducirError(error), 'error'); totales(); return; }
     ultima = { ...data, cliente, recibido: metodo === 'efectivo' && !Number.isNaN(recibido) ? recibido : null };
     vaciar();
+    cargarCatalogo();
     mostrarRecibo();
   }
 
@@ -212,6 +256,19 @@ App.registrar('vender', (() => {
     const scan = $('#v-scan');
     scan.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => buscar(scan.value), 220); });
     scan.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); procesar(scan.value); } });
+    $('#v-filtro').addEventListener('input', () => { visibles = 40; pintarLista(); });
+    $('#v-cat').addEventListener('change', () => { visibles = 40; pintarLista(); });
+    $('#v-mas').addEventListener('click', () => { visibles += 40; pintarLista(); });
+    $('#v-lista').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-add]');
+      if (!b || b.disabled) return;
+      const p = catalogo.find((x) => String(x.id) === b.dataset.add);
+      if (p) agregar(p);
+    });
+    $('#v-barra').addEventListener('click', () => {
+      const r = $('#v-resumen');
+      r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
     $('#v-cam').addEventListener('click', () => Escaner.abrir((codigo) => procesar(codigo)));
 
     $('#v-sug').addEventListener('click', (e) => {
@@ -259,6 +316,7 @@ App.registrar('vender', (() => {
   }
 
   function mostrar() {
+    cargarCatalogo();
     if (window.matchMedia('(pointer: fine)').matches) $('#v-scan').focus();
   }
 

@@ -1,5 +1,5 @@
 // Service worker simple: red primero, caché como respaldo (solo archivos de la app).
-const CACHE = 'urbanstore-v2';
+const CACHE = 'urbanstore-v3';
 const BASE = [
   './', 'index.html', 'admin.html', 'icon.svg',
   'css/ui.css', 'css/public.css', 'css/panel.css',

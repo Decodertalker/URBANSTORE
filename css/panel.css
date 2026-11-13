@@ -167,3 +167,22 @@ table.t tr:last-child td { border-bottom: 0; }
   .etq .pie { display: flex; justify-content: space-between; align-items: baseline; font: 700 8pt Arial, sans-serif; }
   .etq .pie b { font-size: 10pt; }
 }
+
+/* Listado de productos en Vender */
+.vcard { display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 10px; background: var(--paper); border: var(--line); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); min-width: 0; }
+.vcard .thumb { width: 84px; height: 84px; border-radius: 10px; border: 2px solid var(--ink); }
+.vcard h3 { font: 800 .98rem/1.25 var(--font-body); overflow-wrap: anywhere; }
+.vcard .code { font: 700 .78rem ui-monospace, Menlo, Consolas, monospace; color: var(--muted); }
+.vcard .pp { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: .86rem; color: var(--muted); margin: 4px 0 8px; font-variant-numeric: tabular-nums; }
+.vcard .pp b { color: var(--ink); }
+.vcard .acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.vlista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-top: 10px; }
+.vlista .vcard { grid-template-columns: 64px 1fr; }
+.vlista .vcard .thumb { width: 64px; height: 64px; }
+.vlista .vcard.agotado { opacity: .55; }
+.vlista .enc { font-size: .8rem; font-weight: 700; color: var(--muted); }
+#v-mas { margin-top: 10px; width: 100%; }
+.cartbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--ink); color: #fff; border: var(--line); border-radius: 999px; padding: 12px 20px; font: 800 .95rem var(--font-body); box-shadow: 3px 3px 0 var(--celeste-2); cursor: pointer; max-width: calc(100% - 32px); }
+.cartbar.hidden { display: none; }
+#v-filtro { min-width: 0; font-size: 1rem; }
+#v-cat { width: auto; flex: 0 0 38%; min-width: 0; }
