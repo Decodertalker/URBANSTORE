@@ -3,157 +3,105 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1f2937">
-  <title>Inventario de Ropa</title>
+  <meta name="theme-color" content="#0b0b0d">
+  <title>URBANSTORE</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Bungee&display=swap">
+  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/public.css">
 </head>
 <body>
 
-  <!-- ===== LOGIN ===== -->
-  <section id="vista-login" class="login hidden">
-    <form id="form-login" class="login-card" autocomplete="on">
-      <div class="logo">👕</div>
-      <h1 id="login-titulo">Inventario</h1>
-      <p class="sub">Acceso solo para personal autorizado</p>
-      <label>Usuario
-        <input id="login-usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
-      </label>
-      <label>Contraseña
-        <input id="login-pass" type="password" autocomplete="current-password" minlength="8" required>
-      </label>
-      <p id="login-msg" class="msg" role="alert"></p>
-      <button id="btn-entrar" class="btn primario" type="submit">Entrar</button>
-    </form>
-  </section>
-
-  <!-- ===== APP ===== -->
-  <div id="vista-app" class="hidden">
-    <header class="topbar">
-      <div>
-        <strong id="app-titulo">Inventario</strong>
-        <small id="app-usuario"></small>
-      </div>
-      <div class="topbar-acciones">
-        <button id="btn-clave" class="icono" title="Cambiar mi contraseña" aria-label="Cambiar mi contraseña">🔑</button>
-        <button id="btn-refrescar" class="icono" title="Actualizar" aria-label="Actualizar">⟳</button>
-        <button id="btn-salir" class="icono" title="Salir" aria-label="Salir">⎋</button>
-      </div>
-    </header>
-
-    <nav class="tabs">
-      <button class="tab active" data-tab="productos">Productos</button>
-      <button class="tab" data-tab="datos">Excel / Descargas</button>
-      <button class="tab hidden" id="tab-usuarios" data-tab="usuarios">Usuarios</button>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="URBANSTORE, inicio">URBANSTORE</a>
+    <nav class="nav" aria-label="Principal">
+      <a class="link" href="#productos">Catálogo</a>
+      <a class="link" id="nav-contacto" href="#contacto" hidden>Contacto</a>
+      <a class="btn small" href="admin.html">Acceso personal</a>
     </nav>
-
-    <main>
-      <!-- Productos -->
-      <section id="panel-productos" class="panel">
-        <div class="stats" id="stats"></div>
-        <div class="barra">
-          <input id="buscar" type="search" placeholder="Buscar producto…" aria-label="Buscar">
-          <select id="orden" aria-label="Ordenar">
-            <option value="nombre">A–Z</option>
-            <option value="stock">Poco stock primero</option>
-            <option value="reciente">Recientes</option>
-          </select>
-        </div>
-        <div id="lista" class="lista"></div>
-        <button id="btn-nuevo" class="fab" aria-label="Agregar producto">＋</button>
-      </section>
-
-      <!-- Excel / Descargas -->
-      <section id="panel-datos" class="panel hidden">
-        <div class="caja">
-          <h2>Descargar base de datos actualizada</h2>
-          <p>Descarga el inventario tal como está ahora mismo en el sistema.</p>
-          <div class="fila">
-            <button id="btn-export-xlsx" class="btn primario">Descargar Excel (.xlsx)</button>
-            <button id="btn-export-csv" class="btn">Descargar CSV</button>
-          </div>
-        </div>
-
-        <div class="caja">
-          <h2>Importar desde Excel</h2>
-          <p>Columnas: <b>Nombre, Costo compra, Precio venta, Existencia</b>. Si el nombre ya existe, se actualizan sus datos (la foto se conserva). Las fotos se agregan después, producto por producto.</p>
-          <div class="fila">
-            <button id="btn-plantilla" class="btn">Descargar plantilla</button>
-            <label class="btn archivo">Elegir archivo…
-              <input id="archivo-excel" type="file" accept=".xlsx,.xls,.csv" hidden>
-            </label>
-          </div>
-          <div id="import-preview" class="preview hidden"></div>
-          <button id="btn-importar" class="btn primario hidden">Importar al inventario</button>
-        </div>
-      </section>
-
-      <!-- Usuarios -->
-      <section id="panel-usuarios" class="panel hidden">
-        <div class="caja">
-          <h2>Usuarios permitidos</h2>
-          <p>Crea usuarios con nombre de usuario y contraseña (sin correo). Cada persona entra a la app con esos datos y puede cambiar su contraseña con el botón 🔑.</p>
-          <form id="form-usuario" class="fila">
-            <input id="u-usuario" type="text" placeholder="usuario (ej. maria)" autocapitalize="none" autocomplete="off" spellcheck="false" required>
-            <input id="u-pass" type="text" placeholder="contraseña (mín. 8)" minlength="8" autocomplete="off" required>
-            <select id="u-rol" aria-label="Rol">
-              <option value="empleado">Empleado</option>
-              <option value="admin">Administrador</option>
-            </select>
-            <button class="btn primario" type="submit">Crear usuario</button>
-          </form>
-          <div id="lista-usuarios" class="usuarios"></div>
-        </div>
-      </section>
-    </main>
   </div>
+</header>
 
-  <!-- ===== MODAL PRODUCTO ===== -->
-  <dialog id="modal-producto">
-    <form id="form-producto" method="dialog">
-      <h2 id="modal-titulo">Nuevo producto</h2>
-
-      <div class="foto-edit">
-        <div id="p-preview" class="foto grande"><span>👕</span></div>
-        <div class="foto-botones">
-          <label class="btn archivo">Tomar / elegir foto
-            <input id="p-foto" type="file" accept="image/*" hidden>
-          </label>
-          <button id="p-quitar-foto" type="button" class="btn link hidden">Quitar foto</button>
-        </div>
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">Catálogo de la tienda</span>
+      <h1>Viste <span class="mark">la calle</span></h1>
+      <p class="lead">Camisetas, hoodies, pantalones y accesorios que tenemos hoy en tienda. Mira el catálogo y escríbenos para apartar tu prenda.</p>
+      <div class="hero-actions">
+        <a class="btn dark" href="#productos">Ver catálogo</a>
+        <a class="btn" id="hero-wa" target="_blank" rel="noopener" hidden>Escríbenos por WhatsApp</a>
       </div>
-
-      <label>Nombre del producto
-        <input id="p-nombre" type="text" maxlength="150" required>
-      </label>
-      <div class="dos">
-        <label>Costo de compra
-          <input id="p-costo" type="number" inputmode="decimal" min="0" step="0.01" value="0" required>
-        </label>
-        <label>Precio de venta
-          <input id="p-precio" type="number" inputmode="decimal" min="0" step="0.01" value="0" required>
-        </label>
+      <div class="hero-meta">
+        <span id="hero-count">Cargando catálogo…</span>
+        <span>Existencias al día</span>
       </div>
-      <label>Existencia
-        <input id="p-existencia" type="number" inputmode="numeric" min="0" step="1" value="0" required>
-      </label>
+    </div>
+    <div class="hero-art" id="hero-art" aria-hidden="true"></div>
+  </div>
+</section>
 
-      <p id="p-msg" class="msg" role="alert"></p>
-      <div class="fila fin">
-        <button id="p-eliminar" type="button" class="btn peligro hidden">Eliminar</button>
-        <span class="espacio"></span>
-        <button id="p-cancelar" type="button" class="btn">Cancelar</button>
-        <button id="p-guardar" type="submit" class="btn primario">Guardar</button>
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <div class="ticker-group"><span>Catálogo actualizado</span><span>Disponible en tienda</span><span>Consulta tu prenda</span><span>URBANSTORE</span></div>
+    <div class="ticker-group"><span>Catálogo actualizado</span><span>Disponible en tienda</span><span>Consulta tu prenda</span><span>URBANSTORE</span></div>
+  </div>
+</div>
+
+<section class="catalog" id="productos">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Catálogo</h2>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="search">
+      <label class="sr" for="buscar">Buscar prenda</label>
+      <input id="buscar" type="search" placeholder="Buscar prenda…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Categorías"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="contact" id="contacto" hidden>
+  <div class="wrap" id="contacto-items"></div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="logo">URBANSTORE</span>
+    <small>© <span id="anio"></span> URBANSTORE</small>
+    <a class="staff" href="admin.html">Acceso personal</a>
+  </div>
+</footer>
+
+<dialog id="detalle" class="detalle" aria-labelledby="m-nombre">
+  <div class="m-grid">
+    <div class="m-thumb thumb" id="m-thumb"></div>
+    <div class="m-info">
+      <div class="m-top">
+        <span class="m-cat" id="m-cat"></span>
+        <button class="btn small" id="m-cerrar" type="button">Cerrar</button>
       </div>
-    </form>
-  </dialog>
+      <h3 id="m-nombre"></h3>
+      <div class="m-price" id="m-precio"></div>
+      <span class="stock" id="m-stock"></span>
+      <span class="m-code" id="m-codigo"></span>
+      <p class="m-note">Escríbenos o visítanos para confirmar tallas y apartar tu prenda.</p>
+      <a class="btn dark" id="m-wa" target="_blank" rel="noopener" hidden>Consultar por WhatsApp</a>
+    </div>
+  </div>
+</dialog>
 
-  <div id="toast" role="status" aria-live="polite"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/public.js"></script>
 </body>
 </html>

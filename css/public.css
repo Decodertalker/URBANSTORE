@@ -1,0 +1,117 @@
+/* Catálogo público de URBANSTORE */
+.site-header .nav { display: flex; align-items: center; gap: 18px; }
+.nav a.link { font-weight: 700; text-decoration: none; font-size: .95rem; }
+.nav a.link:hover { text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: var(--celeste-2); text-underline-offset: 4px; }
+@media (max-width: 520px) { .nav a.link { display: none; } .logo { font-size: 1.25rem; } }
+
+/* Hero */
+.hero { padding-block: 40px 44px; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; align-items: center; }
+.hero-copy { min-width: 0; }
+.eyebrow {
+  display: inline-block; font-weight: 800; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 12px; border: var(--line); border-radius: 999px; background: var(--paper);
+}
+.hero h1 {
+  font-family: var(--font-display); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(2.3rem, 7.2vw, 4.6rem); line-height: .98; margin: 18px 0 16px; text-wrap: balance;
+}
+.mark { background: linear-gradient(transparent 58%, var(--celeste) 58% 92%, transparent 92%); padding-inline: 2px; }
+.hero p.lead { font-size: 1.1rem; max-width: 46ch; color: var(--muted); margin: 0 0 24px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.hero-meta { margin-top: 22px; font-size: .9rem; font-weight: 700; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.hero-meta span::before { content: ""; display: inline-block; width: 9px; height: 9px; background: var(--ink); margin-right: 8px; border-radius: 50%; }
+
+.hero-art {
+  position: relative; width: 100%; max-width: 440px; justify-self: center; aspect-ratio: 1 / 1;
+  background-color: var(--celeste);
+  background-image: radial-gradient(var(--celeste-2) 1.6px, transparent 1.8px); background-size: 15px 15px;
+  border: var(--line); border-radius: 22px; box-shadow: 8px 8px 0 var(--ink); overflow: hidden;
+}
+.hero-art svg { position: absolute; }
+.hero-art .a-hoodie { width: 66%; left: 17%; top: 15%; color: var(--paper); }
+.hero-art .a-tee { width: 28%; right: 5%; top: 6%; color: var(--rosa); transform: rotate(8deg); }
+.hero-art .a-cap { width: 28%; left: 5%; bottom: 7%; color: var(--mantequilla); transform: rotate(-8deg); }
+.sticker {
+  position: absolute; left: 5%; top: 6%; width: 27%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--mantequilla); border: var(--line); display: grid; place-items: center; text-align: center;
+  font-family: var(--font-display); font-size: clamp(.55rem, 1.9vw, .75rem); line-height: 1.15; transform: rotate(-12deg);
+}
+@media (max-width: 800px) {
+  .hero .wrap { grid-template-columns: 1fr; gap: 28px; }
+  .hero { padding-block: 28px 32px; }
+}
+
+/* Cinta */
+.ticker { background: var(--ink); color: var(--paper); overflow: hidden; }
+.ticker-track { display: flex; width: max-content; animation: run 30s linear infinite; }
+.ticker-group { display: flex; flex: none; }
+.ticker-group span { font-family: var(--font-display); font-size: .8rem; letter-spacing: .06em; padding: 11px 0 11px 22px; white-space: nowrap; }
+.ticker-group span::after { content: "//"; margin-left: 22px; color: var(--celeste); }
+@keyframes run { to { transform: translateX(-50%); } }
+
+/* Catálogo */
+.catalog { padding-block: 44px 56px; scroll-margin-top: 70px; }
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-bottom: 18px; }
+.section-head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.7rem, 5vw, 2.6rem); line-height: 1; text-transform: uppercase; }
+.count { font-weight: 700; color: var(--muted); }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); padding-top: 10px; }
+@media (min-width: 720px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; } }
+.card {
+  display: flex; flex-direction: column; text-align: left; padding: 0; min-width: 0; font: inherit; color: inherit; cursor: pointer;
+  background: var(--paper); border: var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+  transition: transform .12s, box-shadow .12s;
+}
+.card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.card .thumb { aspect-ratio: 4 / 5; border-bottom: var(--line); }
+.card.agotado .thumb svg.ph, .card.agotado .thumb img { opacity: .5; }
+.badge {
+  position: absolute; left: 10px; top: 10px; font: 800 .72rem/1 var(--font-body); letter-spacing: .04em; text-transform: uppercase;
+  padding: 6px 9px; border: var(--line); border-radius: 999px; background: var(--paper); color: var(--ink);
+}
+.badge.low { background: var(--mantequilla); }
+.badge.out { background: var(--ink); color: var(--paper); }
+.info { padding: 12px 14px 14px; display: grid; gap: 4px; }
+.info h3 {
+  font: 700 .98rem/1.25 var(--font-body);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5em;
+}
+.price { font: 800 1.2rem var(--font-body); font-variant-numeric: tabular-nums; }
+.price small { font-size: .75em; font-weight: 700; margin-right: 3px; }
+.empty { grid-column: 1 / -1; border: 2px dashed var(--ink); border-radius: 16px; padding: 34px 20px; text-align: center; background: var(--paper); }
+.empty p { margin: 0 0 14px; font-weight: 700; }
+.search input { min-height: 48px; }
+
+/* Contacto */
+.contact { background: var(--celeste); border-block: var(--line); padding-block: 40px; scroll-margin-top: 70px; }
+.contact .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 22px; }
+.contact h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; margin: 0 0 6px; text-transform: uppercase; }
+.contact p { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+
+/* Pie */
+.site-footer { background: var(--ink); color: var(--paper); padding-block: 30px; }
+.site-footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.site-footer .logo { color: var(--paper); text-shadow: 2px 2px 0 var(--celeste-2); font-size: 1.3rem; }
+.site-footer small { color: #c9d3da; }
+.site-footer a.staff { font-weight: 700; color: var(--paper); text-decoration-color: var(--celeste); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+/* Detalle del producto */
+dialog.detalle { width: min(740px, calc(100% - 32px)); }
+.m-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.m-thumb { border-right: var(--line); min-height: 280px; }
+.m-info { padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.m-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.m-cat { font-weight: 800; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.m-info h3 { font: 800 1.5rem/1.15 var(--font-body); text-wrap: balance; }
+.m-price { font: 800 1.9rem var(--font-body); font-variant-numeric: tabular-nums; }
+.m-price small { font-size: .55em; margin-right: 4px; }
+.stock { display: inline-flex; align-items: center; font-weight: 700; padding: 7px 12px; border: var(--line); border-radius: 999px; justify-self: start; background: var(--menta); }
+.stock.low { background: var(--mantequilla); }
+.stock.out { background: var(--rosa); }
+.m-note { margin: 0; font-size: .88rem; color: var(--muted); }
+.m-code { font: 700 .8rem ui-monospace, Menlo, Consolas, monospace; color: var(--muted); }
+@media (max-width: 620px) {
+  .m-grid { grid-template-columns: 1fr; }
+  .m-thumb { border-right: 0; border-bottom: var(--line); min-height: 220px; }
+}

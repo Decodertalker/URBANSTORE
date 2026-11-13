@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0d">
+  <meta name="robots" content="noindex">
+  <title>URBANSTORE · Panel</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Bungee&display=swap">
+  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+<!-- ============ ACCESO ============ -->
+<section id="vista-login" class="login hidden">
+  <div class="login-grid">
+    <div class="login-copy">
+      <span class="eyebrow">Solo personal</span>
+      <h1>Acceso al panel</h1>
+      <p>Entra con tu usuario y contraseña para vender, administrar productos, existencias y reportes. Los clientes solo ven el catálogo.</p>
+      <a class="btn" href="./">Volver al catálogo</a>
+    </div>
+    <div class="login-card">
+      <header>URBANSTORE · Iniciar sesión</header>
+      <form id="form-login">
+        <label class="f" for="login-usuario">Usuario
+          <input id="login-usuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+        </label>
+        <label class="f" for="login-pass">Contraseña
+          <input id="login-pass" type="password" autocomplete="current-password" required>
+        </label>
+        <p id="login-msg" class="msg" role="alert"></p>
+        <button id="btn-entrar" class="btn dark" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PANEL ============ -->
+<div id="vista-app" class="hidden">
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="./" aria-label="URBANSTORE, ver catálogo">URBANSTORE</a>
+      <div class="top-user">
+        <span class="who" id="usr"></span>
+        <button id="btn-clave" class="btn small" type="button">Contraseña</button>
+        <button id="btn-salir" class="btn small dark" type="button">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Secciones del panel">
+    <button class="tab" type="button" data-tab="dashboard" data-admin="1">Dashboard</button>
+    <button class="tab" type="button" data-tab="vender">Vender</button>
+    <button class="tab" type="button" data-tab="productos" data-admin="1">Productos</button>
+    <button class="tab" type="button" data-tab="reportes" data-admin="1">Reportes</button>
+    <button class="tab" type="button" data-tab="excel" data-admin="1">Excel</button>
+    <button class="tab" type="button" data-tab="ajustes" data-admin="1">Ajustes</button>
+  </nav>
+
+  <main class="wrap panel-main">
+
+    <!-- ===== Dashboard ===== -->
+    <section id="p-dashboard" class="panel hidden">
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <h2 class="t" style="margin:0">Dashboard de ventas</h2>
+        <div class="chips" id="db-rango" style="padding:0">
+          <button class="chip" type="button" data-dias="1">Hoy</button>
+          <button class="chip" type="button" data-dias="7">7 días</button>
+          <button class="chip" type="button" data-dias="30">30 días</button>
+        </div>
+      </div>
+      <div class="kpis" id="db-kpis"></div>
+      <div class="dash-grid">
+        <div class="box"><h3>Productos top</h3><div id="db-top" class="bars"></div></div>
+        <div class="box"><h3>Ventas por día</h3><div id="db-dias"></div></div>
+        <div class="box">
+          <h3><span class="live-dot off" id="db-dot"></span>Salidas en vivo <span class="muted" id="db-live-estado" style="font-family:var(--font-body);text-transform:none"></span></h3>
+          <div id="db-live"></div>
+        </div>
+        <div class="box"><h3>Inventario</h3><div id="db-inv"></div><div id="db-bajo" style="margin-top:12px"></div></div>
+      </div>
+    </section>
+
+    <!-- ===== Vender ===== -->
+    <section id="p-vender" class="panel hidden">
+      <h2 class="t">Salida de productos</h2>
+      <div class="split">
+        <div>
+          <div class="box">
+            <label class="f" for="v-scan">Escanea el código o busca por nombre
+              <span class="hint">Un lector de códigos escribe el código y pulsa Enter solo.</span>
+            </label>
+            <div class="scanrow" style="margin-top:8px">
+              <input id="v-scan" type="search" inputmode="search" placeholder="Código o nombre del producto" autocomplete="off" autocapitalize="none" spellcheck="false">
+              <button id="v-cam" class="btn" type="button">Cámara</button>
+            </div>
+            <div id="v-sug" class="sug"></div>
+          </div>
+          <div id="v-lineas" class="cart"></div>
+        </div>
+        <aside class="box sum" aria-label="Consolidado de la venta">
+          <h3>Consolidado</h3>
+          <div class="r"><span>Productos distintos</span><b id="v-items">0</b></div>
+          <div class="r"><span>Unidades</span><b id="v-unid">0</b></div>
+          <div class="r"><span>Subtotal</span><b id="v-sub">0.00</b></div>
+          <div class="r"><label for="v-desc">Descuento</label><input id="v-desc" type="number" inputmode="decimal" min="0" step="0.01" value="0"></div>
+          <div class="r total"><span>Total a pagar</span><b id="v-total">0.00</b></div>
+          <label class="f" for="v-metodo">Método de pago
+            <select id="v-metodo">
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </label>
+          <div class="r" id="v-fila-recibido"><label for="v-recibido">Recibido</label><input id="v-recibido" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="r cambio" id="v-fila-cambio"><span>Cambio</span><b id="v-cambio">0.00</b></div>
+          <label class="f" for="v-cliente">Cliente (opcional)<input id="v-cliente" type="text" maxlength="80"></label>
+          <label class="f" for="v-nota">Nota (opcional)<input id="v-nota" type="text" maxlength="160"></label>
+          <button id="v-cobrar" class="btn dark" type="button" disabled>Cobrar</button>
+          <button id="v-vaciar" class="btn" type="button">Vaciar carrito</button>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== Productos ===== -->
+    <section id="p-productos" class="panel hidden">
+      <h2 class="t">Productos</h2>
+      <div class="toolbar">
+        <input id="pr-q" class="q" type="search" placeholder="Buscar por nombre o código…" autocomplete="off" aria-label="Buscar producto">
+        <select id="pr-cat" class="c" aria-label="Categoría"></select>
+      </div>
+      <div class="row" style="margin-bottom:14px">
+        <button id="pr-nuevo" class="btn dark" type="button">Nuevo producto</button>
+        <button id="pr-entrada" class="btn" type="button">Registrar entrada</button>
+        <button id="pr-etiquetas" class="btn" type="button">Imprimir etiquetas</button>
+        <span class="muted" id="pr-count"></span>
+      </div>
+      <div id="pr-lista" class="pgrid"></div>
+      <div class="row" style="justify-content:center;margin-top:16px"><button id="pr-mas" class="btn hidden" type="button">Ver más</button></div>
+    </section>
+
+    <!-- ===== Reportes ===== -->
+    <section id="p-reportes" class="panel hidden">
+      <h2 class="t">Reportes</h2>
+      <div class="subtabs" id="rp-tabs">
+        <button class="chip" type="button" data-rep="salidas">Salidas</button>
+        <button class="chip" type="button" data-rep="entradas">Entradas</button>
+        <button class="chip" type="button" data-rep="inventario">Inventario general</button>
+        <button class="chip" type="button" data-rep="ajustes">Ajustes</button>
+      </div>
+      <div class="filters">
+        <div class="row" id="rp-fechas" style="align-items:end">
+          <label class="f" for="rp-desde">Desde<input id="rp-desde" type="date"></label>
+          <label class="f" for="rp-hasta">Hasta<input id="rp-hasta" type="date"></label>
+        </div>
+        <div class="chips" id="rp-rapido" style="padding:0">
+          <button class="chip" type="button" data-r="hoy">Hoy</button>
+          <button class="chip" type="button" data-r="7">7 días</button>
+          <button class="chip" type="button" data-r="mes">Este mes</button>
+        </div>
+        <label class="f grow" for="rp-q">Buscar<input id="rp-q" type="search" placeholder="Producto, código, usuario…" autocomplete="off"></label>
+        <button id="rp-xlsx" class="btn" type="button">Descargar Excel</button>
+      </div>
+      <div class="sumline" id="rp-resumen"></div>
+      <div class="tablewrap"><table class="t" id="rp-tabla"></table></div>
+      <p class="muted" id="rp-nota" style="margin-top:8px"></p>
+    </section>
+
+    <!-- ===== Excel ===== -->
+    <section id="p-excel" class="panel hidden">
+      <h2 class="t">Excel</h2>
+      <div class="stack">
+        <div class="box">
+          <h3>1. Descargar la plantilla</h3>
+          <p>Hojas <b>GENERAL</b>, <b>entrada</b> y <b>SALIDA</b>. Para cargar productos llena solo la hoja <b>entrada</b>. El ID y el código se crean solos.</p>
+          <a class="btn" href="plantilla/PLANTILLA_URBANSTORE.xlsx" download>Descargar plantilla</a>
+        </div>
+        <div class="box">
+          <h3>2. Importar la hoja “entrada”</h3>
+          <p>Cada fila suma su cantidad a la existencia. Si el producto no existe se crea, y si la categoría no existe también. No subas el mismo archivo dos veces: la cantidad se sumaría de nuevo.</p>
+          <label class="btn" for="xl-archivo" style="cursor:pointer">Elegir archivo…</label>
+          <input id="xl-archivo" type="file" accept=".xlsx,.xls,.csv" class="sr">
+          <div id="xl-preview" style="margin-top:12px"></div>
+          <button id="xl-importar" class="btn dark hidden" type="button" style="margin-top:12px">Importar al inventario</button>
+        </div>
+        <div class="box">
+          <h3>3. Descargar la base de datos actualizada</h3>
+          <p>Un solo archivo con tres hojas: GENERAL (inventario actual), entrada y SALIDA, con las mismas columnas de la plantilla y el usuario que registró cada movimiento.</p>
+          <button id="xl-bd" class="btn dark" type="button">Descargar base de datos</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Ajustes ===== -->
+    <section id="p-ajustes" class="panel hidden">
+      <h2 class="t">Ajustes</h2>
+      <div class="cols2">
+        <div class="box">
+          <h3>Categorías</h3>
+          <p>El código de cada producto es el prefijo de su categoría más su número, por ejemplo <b>CAM-00012</b>.</p>
+          <form id="cat-form" class="row">
+            <input id="cat-nombre" type="text" placeholder="Nueva categoría" maxlength="40" required aria-label="Nombre de la categoría">
+            <input id="cat-prefijo" type="text" placeholder="Prefijo (opcional)" maxlength="5" autocapitalize="characters" style="max-width:150px" aria-label="Prefijo">
+            <button class="btn dark" type="submit">Agregar</button>
+          </form>
+          <div id="cat-lista" class="items"></div>
+        </div>
+        <div class="box">
+          <h3>Usuarios</h3>
+          <p>Cada persona entra con su usuario y contraseña. Los empleados solo pueden hacer salidas (ventas).</p>
+          <form id="form-usuario" class="row">
+            <input id="u-usuario" type="text" placeholder="usuario (ej. maria)" autocapitalize="none" autocomplete="off" spellcheck="false" required aria-label="Usuario">
+            <input id="u-pass" type="text" placeholder="contraseña (mín. 8)" minlength="8" autocomplete="off" required aria-label="Contraseña inicial">
+            <select id="u-rol" aria-label="Rol">
+              <option value="empleado">Empleado (vende)</option>
+              <option value="admin">Administrador</option>
+            </select>
+            <button class="btn dark" type="submit">Crear usuario</button>
+          </form>
+          <div id="lista-usuarios" class="items"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ DIÁLOGOS ============ -->
+<dialog id="d-prod" aria-labelledby="pf-titulo">
+  <form id="f-prod" class="dlg" method="dialog">
+    <h2 id="pf-titulo">Nuevo producto</h2>
+    <div class="photo-edit">
+      <div class="thumb" id="pf-prev"></div>
+      <div class="stack" style="gap:6px">
+        <label class="btn small" for="pf-foto" style="cursor:pointer">Tomar o elegir foto</label>
+        <input id="pf-foto" type="file" accept="image/*" class="sr">
+        <button id="pf-quitar" class="btn small hidden" type="button">Quitar foto</button>
+      </div>
+    </div>
+    <label class="f" for="pf-nombre">Nombre del producto<input id="pf-nombre" type="text" maxlength="150" required></label>
+    <div class="dos">
+      <label class="f" for="pf-cat">Categoría<select id="pf-cat" required></select></label>
+      <label class="f" for="pf-prov">Proveedor<input id="pf-prov" type="text" maxlength="100"></label>
+    </div>
+    <div class="dos">
+      <label class="f" for="pf-costo">Precio de compra<input id="pf-costo" type="number" inputmode="decimal" min="0" step="0.01" value="0" required></label>
+      <label class="f" for="pf-precio">Precio de venta<input id="pf-precio" type="number" inputmode="decimal" min="0" step="0.01" value="0" required></label>
+    </div>
+    <div class="dos" id="pf-nuevo-box">
+      <label class="f" for="pf-exist">Existencia inicial<input id="pf-exist" type="number" inputmode="numeric" min="0" step="1" value="0"></label>
+      <label class="f" for="pf-fecha">Fecha de ingreso<input id="pf-fecha" type="date"></label>
+    </div>
+    <div id="pf-edit-box" class="hidden stack" style="gap:8px">
+      <div class="row"><span>Código: <b id="pf-codigo"></b></span><span>Existencia: <b id="pf-exist-act"></b></span></div>
+      <p class="muted" style="margin:0;font-size:.85rem">La existencia cambia con una entrada, una venta o un ajuste, para que todo quede registrado.</p>
+      <div class="row"><button id="pf-ajustar" class="btn small" type="button">Ajustar existencia</button></div>
+    </div>
+    <label class="row" for="pf-visible" style="gap:10px;font-weight:700"><input id="pf-visible" type="checkbox" checked> Mostrar en el catálogo público</label>
+    <p id="pf-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions">
+      <button id="pf-eliminar" class="btn danger push hidden" type="button">Eliminar</button>
+      <button id="pf-cancelar" class="btn" type="button">Cancelar</button>
+      <button id="pf-guardar" class="btn dark" type="submit">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="d-entrada" aria-labelledby="en-titulo">
+  <form id="f-ent" class="dlg" method="dialog">
+    <h2 id="en-titulo">Registrar entrada</h2>
+    <div id="en-buscar">
+      <label class="f" for="en-scan">Escanea el código o busca el producto</label>
+      <div class="scanrow" style="margin-top:6px">
+        <input id="en-scan" type="search" placeholder="Código o nombre" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <button id="en-cam" class="btn" type="button">Cámara</button>
+      </div>
+      <div id="en-sug" class="sug"></div>
+    </div>
+    <div id="en-prod" class="pick hidden"></div>
+    <div class="dos">
+      <label class="f" for="en-cant">Cantidad que ingresa<input id="en-cant" type="number" inputmode="numeric" min="1" step="1" value="1" required></label>
+      <label class="f" for="en-fecha">Fecha<input id="en-fecha" type="date" required></label>
+    </div>
+    <div class="dos">
+      <label class="f" for="en-costo">Precio de compra<input id="en-costo" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      <label class="f" for="en-precio">Precio de venta<input id="en-precio" type="number" inputmode="decimal" min="0" step="0.01"></label>
+    </div>
+    <label class="f" for="en-prov">Proveedor<input id="en-prov" type="text" maxlength="100"></label>
+    <p id="en-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions">
+      <button id="en-cancelar" class="btn" type="button">Cancelar</button>
+      <button id="en-guardar" class="btn dark" type="submit">Registrar entrada</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="d-ajuste" aria-labelledby="aj-titulo">
+  <form id="f-aj" class="dlg" method="dialog">
+    <h2 id="aj-titulo">Ajustar existencia</h2>
+    <div id="aj-prod" class="pick"></div>
+    <div class="dos">
+      <label class="f" for="aj-actual">Existencia actual<input id="aj-actual" type="number" disabled></label>
+      <label class="f" for="aj-nueva">Existencia correcta<input id="aj-nueva" type="number" inputmode="numeric" min="0" step="1" required></label>
+    </div>
+    <label class="f" for="aj-motivo">Motivo<input id="aj-motivo" type="text" maxlength="160" placeholder="Conteo físico, prenda dañada…" required></label>
+    <p id="aj-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions">
+      <button id="aj-cancelar" class="btn" type="button">Cancelar</button>
+      <button id="aj-guardar" class="btn dark" type="submit">Guardar ajuste</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="d-etiq" aria-labelledby="et-titulo">
+  <form id="f-et" class="dlg" method="dialog">
+    <h2 id="et-titulo">Imprimir etiquetas</h2>
+    <div id="et-prod" class="pick"></div>
+    <label class="f" for="et-copias">Cantidad de etiquetas<input id="et-copias" type="number" inputmode="numeric" min="1" max="500" step="1" value="1" required></label>
+    <p class="muted" style="margin:0;font-size:.85rem">Etiquetas de 50 × 30 mm con código de barras (Code 128). Sirven con lectores de mano y con la cámara.</p>
+    <div class="dlg-actions">
+      <button id="et-cancelar" class="btn" type="button">Cancelar</button>
+      <button id="et-imprimir" class="btn dark" type="submit">Imprimir</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="d-scan" aria-labelledby="sc-titulo">
+  <div class="dlg">
+    <h2 id="sc-titulo">Escanear con la cámara</h2>
+    <div id="scan-reader"></div>
+    <p id="scan-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions"><button id="scan-cerrar" class="btn" type="button">Cerrar</button></div>
+  </div>
+</dialog>
+
+<dialog id="d-recibo" aria-labelledby="rc-titulo">
+  <div class="dlg">
+    <h2 id="rc-titulo">Venta registrada</h2>
+    <pre class="recibo" id="rc-pre"></pre>
+    <div class="dlg-actions">
+      <button id="rc-imprimir" class="btn" type="button">Imprimir recibo</button>
+      <button id="rc-cerrar" class="btn dark" type="button">Nueva venta</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="print-zone" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/mod-vender.js"></script>
+<script src="js/mod-productos.js"></script>
+<script src="js/mod-dashboard.js"></script>
+<script src="js/mod-reportes.js"></script>
+<script src="js/mod-excel.js"></script>
+<script src="js/mod-ajustes.js"></script>
+<script>App.arrancar();</script>
+</body>
+</html>
