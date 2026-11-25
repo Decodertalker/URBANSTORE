@@ -122,6 +122,7 @@ App.registrar('productos', (() => {
     $('#pf-nombre').value = p ? p.nombre : '';
     $('#pf-cat').value = p ? String(p.categoria_id) : String(App.categorias[0]?.id || '');
     $('#pf-prov').value = p?.proveedor || '';
+    $('#pf-desc').value = p?.descripcion || '';
     $('#pf-costo').value = p ? p.costo_compra : 0;
     $('#pf-precio').value = p ? p.precio_venta : 0;
     $('#pf-exist').value = 0;
@@ -148,6 +149,7 @@ App.registrar('productos', (() => {
     const precio = parseFloat($('#pf-precio').value);
     const existencia = parseInt($('#pf-exist').value, 10) || 0;
     const visible = $('#pf-visible').checked;
+    const descripcion = $('#pf-desc').value.trim().slice(0, 160) || null;
 
     if (!nombre) return (msg.textContent = 'Escribe el nombre del producto.');
     if (!categoria_id) return (msg.textContent = 'Elige una categoría.');
@@ -166,7 +168,7 @@ App.registrar('productos', (() => {
       if (editando) {
         const { error } = await sb.from('productos').update({
           nombre, categoria_id, proveedor: proveedor || null,
-          costo_compra: costo, precio_venta: precio, foto_url, visible
+          costo_compra: costo, precio_venta: precio, foto_url, visible, descripcion
         }).eq('id', editando.id);
         if (error) throw error;
         if (anterior && anterior !== foto_url) await borrarFoto(anterior);
@@ -177,7 +179,7 @@ App.registrar('productos', (() => {
           p_foto_url: foto_url, p_fecha: $('#pf-fecha').value || hoyISO()
         });
         if (error) throw error;
-        if (!visible) await sb.from('productos').update({ visible: false }).eq('id', id);
+        if (!visible || descripcion) await sb.from('productos').update({ visible, descripcion }).eq('id', id);
       }
       $('#d-prod').close();
       toast('Producto guardado', 'ok');

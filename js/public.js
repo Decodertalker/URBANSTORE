@@ -11,12 +11,111 @@ function etiqueta(p) {
   return '';
 }
 
-function pintarHero() {
-  $('#hero-art').innerHTML = `
+/* ---------- Banner de más vendidos ---------- */
+const banner = { items: [], i: 0, timer: null, pausa: false };
+
+function arteMarca() {
+  return `<div class="hero-art" aria-hidden="true">
     <svg class="a-hoodie" viewBox="0 0 120 120"><use href="#hoodie"/></svg>
     <svg class="a-tee" viewBox="0 0 120 120"><use href="#tee"/></svg>
     <svg class="a-cap" viewBox="0 0 120 120"><use href="#cap"/></svg>
-    <div class="sticker">NUEVOS<br>INGRESOS</div>`;
+    <div class="sticker">NUEVOS<br>INGRESOS</div></div>`;
+}
+
+function diapositiva(p, n) {
+  const titulo = p.es_top ? `Más vendido #${n}` : 'Nuevo ingreso';
+  const desc = p.descripcion || `${p.categoria} · Disponible en tienda`;
+  const aviso = p.disponibilidad === 'ultimas' ? `<span class="badge low static">Últimas ${esc(p.unidades)}</span>` : '';
+  return `
+    <article class="tb-slide" data-codigo="${esc(p.codigo)}" aria-roledescription="diapositiva">
+      <div class="tb-copy">
+        <span class="eyebrow">${esc(titulo)}</span>
+        <h2 class="tb-name">${esc(p.nombre)}</h2>
+        <p class="tb-desc">${esc(desc)}</p>
+        <div class="tb-row">
+          <div class="tb-price"><small>${esc(MONEDA)}</small>${esc(entero(p.precio_venta))}</div>
+          ${aviso}
+        </div>
+        <button class="btn small" type="button" data-ver="${esc(p.codigo)}">Ver detalle</button>
+      </div>
+      <div class="tb-media thumb" style="${estiloMiniatura(p)}">${contenidoMiniatura(p)}</div>
+    </article>`;
+}
+
+function diapositivaMarca() {
+  return `
+    <article class="tb-slide tb-marca">
+      <div class="tb-copy">
+        <span class="eyebrow">Catálogo de la tienda</span>
+        <h2 class="tb-name">Viste <span class="mark">la calle</span></h2>
+        <p class="tb-desc">Camisetas, hoodies, pantalones y accesorios que tenemos hoy en tienda. Mira el catálogo y escríbenos para apartar tu prenda.</p>
+      </div>
+      <div class="tb-media tb-art">${arteMarca()}</div>
+    </article>`;
+}
+
+function irA(i, suave = true) {
+  const t = $('#tb-track');
+  const n = banner.items.length || 1;
+  banner.i = (i + n) % n;
+  t.scrollTo({ left: banner.i * t.clientWidth, behavior: suave && !reducirMovimiento() ? 'smooth' : 'auto' });
+  marcarPunto();
+}
+function reducirMovimiento() { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function marcarPunto() {
+  document.querySelectorAll('#tb-dots button').forEach((b, k) => b.setAttribute('aria-current', String(k === banner.i)));
+}
+
+function pintarBanner(items) {
+  banner.items = items;
+  const t = $('#tb-track');
+  let n = 0;
+  t.innerHTML = items.length
+    ? items.map((p) => diapositiva(p, p.es_top ? ++n : 0)).join('')
+    : diapositivaMarca();
+  const varias = items.length > 1;
+  ['#tb-prev', '#tb-next', '#tb-dots'].forEach((s) => { $(s).hidden = !varias; });
+  $('#tb-dots').innerHTML = varias
+    ? items.map((p, k) => `<button type="button" data-i="${k}" aria-label="Ir al producto ${k + 1}"></button>`).join('')
+    : '';
+  banner.i = 0;
+  marcarPunto();
+  clearInterval(banner.timer);
+  if (varias && !reducirMovimiento()) {
+    banner.timer = setInterval(() => { if (!banner.pausa && !document.hidden) irA(banner.i + 1); }, 6000);
+  }
+}
+
+async function cargarBanner() {
+  let items = [];
+  if (sb) {
+    try {
+      const { data, error } = await sb.rpc('mas_vendidos', { p_limite: 5 });
+      if (!error && Array.isArray(data)) items = data;
+    } catch (_) { /* se muestra el banner de la marca */ }
+  }
+  pintarBanner(items);
+}
+
+function iniciarBanner() {
+  const t = $('#tb-track');
+  t.addEventListener('scroll', () => {
+    const k = Math.round(t.scrollLeft / (t.clientWidth || 1));
+    if (k !== banner.i) { banner.i = k; marcarPunto(); }
+  }, { passive: true });
+  $('#tb-prev').addEventListener('click', () => irA(banner.i - 1));
+  $('#tb-next').addEventListener('click', () => irA(banner.i + 1));
+  $('#tb-dots').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) irA(Number(b.dataset.i)); });
+  const tb = $('#tb');
+  ['pointerenter', 'focusin', 'touchstart'].forEach((ev) => tb.addEventListener(ev, () => { banner.pausa = true; }, { passive: true }));
+  ['pointerleave', 'focusout', 'touchend'].forEach((ev) => tb.addEventListener(ev, () => { banner.pausa = false; }, { passive: true }));
+  t.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ver]');
+    const p = b && banner.items.find((x) => x.codigo === b.dataset.ver);
+    if (p) abrir(p);
+  });
+  window.addEventListener('resize', () => irA(banner.i, false));
+  cargarBanner();
 }
 
 function pintarContacto() {
@@ -74,6 +173,9 @@ function abrir(p) {
   $('#m-nombre').textContent = p.nombre;
   $('#m-precio').innerHTML = `<small>${esc(MONEDA)}</small>${esc(entero(p.precio_venta))}`;
   $('#m-codigo').textContent = `Código ${p.codigo}`;
+  const d = $('#m-desc');
+  d.textContent = p.descripcion || '';
+  d.hidden = !p.descripcion;
   const s = $('#m-stock');
   s.className = 'stock' + (p.disponibilidad === 'agotado' ? ' out' : p.disponibilidad === 'ultimas' ? ' low' : '');
   s.textContent = p.disponibilidad === 'agotado' ? 'Agotado por ahora'
@@ -128,7 +230,7 @@ dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 
 $('#anio').textContent = new Date().getFullYear();
 inyectarSprite();
-pintarHero();
+iniciarBanner();
 pintarContacto();
 cargar();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

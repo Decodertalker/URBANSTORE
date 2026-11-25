@@ -29,6 +29,9 @@ Cada entrada, salida y ajuste guarda el **usuario** que lo hizo.
 - Plantilla en `plantilla/PLANTILLA_URBANSTORE.xlsx`. Se importa la hoja **entrada** (ID y código se generan solos). Si el producto ya existe, se suma la cantidad. La importación es todo o nada: si una fila tiene error, se indica la fila.
 - *Excel → Descargar base de datos* baja un libro con GENERAL, entrada y SALIDA actualizados. Los reportes también se exportan con sus filtros.
 
+## Banner de la página pública
+Arriba del catálogo se muestra un banner con los productos **más vendidos de los últimos 30 días** (nombre, descripción corta y precio de venta), que rota solo y se puede deslizar. Si hay menos de 5 con ventas, se completa con los ingresos más recientes marcados como "Nuevo ingreso". La descripción se escribe en Productos → editar (campo "Descripción corta"); si está vacía se usa la categoría. El público no ve cantidades vendidas ni costos. El botón "Ver catálogo" está debajo del banner.
+
 ## Alertas de reposición
 En *Ajustes → Alertas de reposición* defines cuántos de los productos más vendidos del mes vigilar (top N) y cuándo avisar: cuando queden X unidades o menos, o cuando quede X % o menos de lo que había al empezar el mes (0 apaga ese criterio). Los avisos salen en el Dashboard, en la tarjeta "Por reponer".
 

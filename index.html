@@ -27,22 +27,23 @@
   </div>
 </header>
 
-<section class="hero">
+<section class="top-banner" aria-label="Productos más vendidos">
   <div class="wrap">
-    <div class="hero-copy">
-      <span class="eyebrow">Catálogo de la tienda</span>
-      <h1>Viste <span class="mark">la calle</span></h1>
-      <p class="lead">Camisetas, hoodies, pantalones y accesorios que tenemos hoy en tienda. Mira el catálogo y escríbenos para apartar tu prenda.</p>
-      <div class="hero-actions">
-        <a class="btn dark" href="#productos">Ver catálogo</a>
-        <a class="btn" id="hero-wa" target="_blank" rel="noopener" hidden>Escríbenos por WhatsApp</a>
-      </div>
-      <div class="hero-meta">
-        <span id="hero-count">Cargando catálogo…</span>
-        <span>Existencias al día</span>
-      </div>
+    <h1 class="sr">URBANSTORE · Catálogo de la tienda</h1>
+    <div class="tb" id="tb">
+      <div class="tb-track" id="tb-track" tabindex="0" aria-live="off"></div>
+      <button class="tb-nav prev" id="tb-prev" type="button" aria-label="Anterior" hidden>&#8249;</button>
+      <button class="tb-nav next" id="tb-next" type="button" aria-label="Siguiente" hidden>&#8250;</button>
+      <div class="tb-dots" id="tb-dots" hidden></div>
     </div>
-    <div class="hero-art" id="hero-art" aria-hidden="true"></div>
+    <div class="tb-cta">
+      <a class="btn dark big" href="#productos">Ver catálogo</a>
+      <a class="btn big" id="hero-wa" target="_blank" rel="noopener" hidden>Escríbenos por WhatsApp</a>
+    </div>
+    <div class="hero-meta">
+      <span id="hero-count">Cargando catálogo…</span>
+      <span>Existencias al día</span>
+    </div>
   </div>
 </section>
 
@@ -90,6 +91,7 @@
       </div>
       <h3 id="m-nombre"></h3>
       <div class="m-price" id="m-precio"></div>
+      <p class="m-desc" id="m-desc" hidden></p>
       <span class="stock" id="m-stock"></span>
       <span class="m-code" id="m-codigo"></span>
       <p class="m-note">Escríbenos o visítanos para confirmar tallas y apartar tu prenda.</p>
